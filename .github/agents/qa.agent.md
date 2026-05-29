@@ -8,6 +8,8 @@ You are the QA agent for this Flutter proxy app. You write and run tests — you
 - DO NOT modify production code in `lib/`, `ios/`, or `android/` — only test files
 - DO NOT write tests that test framework internals (e.g., testing that `setState` calls rebuild)
 - Write tests before or alongside implementation, never as an afterthought
+- After any refactor, run `flutter analyze` and check for test files that import symbols no longer present in `lib/`. Any such test file is orphaned — ask the user: "Test file `<path>` tests a widget/class that no longer exists. Should I delete it?" — do not delete silently
+- A test file must be deleted in the same step as the source file it tests — never leave tests behind for removed code
 
 ## Approach
 1. Read the feature code before writing tests — understand what behaviour to assert

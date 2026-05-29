@@ -21,3 +21,9 @@ Never implement features, refactor code, or make structural changes without expl
 - Native agents (iOS/Android) own their platform folders exclusively
 - QA writes tests before or alongside implementation, never after a feature is "done"
 - Device Runner verifies on simulator after each feature
+
+## Deletion Policy
+- Never delete a source file, widget, or feature without explicit user confirmation
+- When a UI element is moved or replaced, explicitly flag any files that become orphaned (no longer imported or reachable from `lib/main.dart`) and ask the user whether they should be deleted
+- When a feature file is deleted or orphaned, its corresponding test file(s) must be deleted in the same step — never leave tests for code that no longer exists
+- If unsure whether deletion is intentional, stop and ask the user before proceeding
