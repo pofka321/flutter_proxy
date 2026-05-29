@@ -1,4 +1,5 @@
 import Flutter
+import NetworkExtension
 import UIKit
 
 class SettingsChannel {
@@ -11,23 +12,29 @@ class SettingsChannel {
     )
 
     channel.setMethodCallHandler { (call: FlutterMethodCall, result: @escaping FlutterResult) in
-      guard call.method == "openWifiSettings" else {
-        result(FlutterMethodNotImplemented)
-        return
-      }
-
-      guard let url = URL(string: UIApplication.openSettingsURLString) else {
-        result(FlutterError(code: "UNAVAILABLE", message: "Cannot open settings", details: nil))
-        return
-      }
-
-      DispatchQueue.main.async {
-        if UIApplication.shared.canOpenURL(url) {
-          UIApplication.shared.open(url, options: [:]) { _ in }
-          result(nil)
-        } else {
+      switch call.method {
+      case "openWifiSettings":
+        guard let url = URL(string: UIApplication.openSettingsURLString) else {
           result(FlutterError(code: "UNAVAILABLE", message: "Cannot open settings", details: nil))
+          return
         }
+
+        DispatchQueue.main.async {
+          if UIApplication.shared.canOpenURL(url) {
+            UIApplication.shared.open(url, options: [:]) { _ in }
+            result(nil)
+          } else {
+            result(FlutterError(code: "UNAVAILABLE", message: "Cannot open settings", details: nil))
+          }
+        }
+
+      case "getWifiSsid":
+        NEHotspotNetwork.fetchCurrent { network in
+          result(network?.ssid)
+        }
+
+      default:
+        result(FlutterMethodNotImplemented)
       }
     }
   }

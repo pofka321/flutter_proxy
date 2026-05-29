@@ -11,4 +11,12 @@ class SettingsChannel {
       rethrow;
     }
   }
+
+  static Future<String?> getWifiSsid() async {
+    try {
+      return await _channel.invokeMethod<String>('getWifiSsid');
+    } on PlatformException {
+      rethrow;
+    }
+  }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../domain/proxy_profile.dart';
 import '../domain/proxy_type.dart';
+import '../../settings/settings_channel.dart';
 
 class ProxyProfileForm extends StatefulWidget {
   const ProxyProfileForm({super.key, this.initial});
@@ -40,6 +41,15 @@ class _ProxyProfileFormState extends State<ProxyProfileForm> {
       text: widget.initial?.port.toString() ?? '',
     );
     _type = widget.initial?.type ?? ProxyType.http;
+    if (widget.initial == null) {
+      SettingsChannel.getWifiSsid().then((ssid) {
+        if (mounted) {
+          setState(() {
+            _nameController.text = ssid ?? '';
+          });
+        }
+      }).catchError((_) {});
+    }
   }
 
   @override
