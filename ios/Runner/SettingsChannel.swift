@@ -29,8 +29,12 @@ class SettingsChannel {
         }
 
       case "getWifiSsid":
-        NEHotspotNetwork.fetchCurrent { network in
-          result(network?.ssid)
+        if #available(iOS 14.0, *) {
+          NEHotspotNetwork.fetchCurrent { network in
+            result(network?.ssid)
+          }
+        } else {
+          result(nil)
         }
 
       default:
