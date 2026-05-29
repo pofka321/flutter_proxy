@@ -3,7 +3,8 @@ import UIKit
 
 class SettingsChannel {
   static func register(with registry: FlutterPluginRegistry) {
-    let messenger = registry.registrar(forPlugin: "SettingsChannel").messenger()
+    guard let registrar = registry.registrar(forPlugin: "SettingsChannel") else { return }
+    let messenger = registrar.messenger()
     let channel = FlutterMethodChannel(
       name: "com.pofka321.flutter_proxy/system_settings",
       binaryMessenger: messenger
