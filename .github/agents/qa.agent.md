@@ -17,11 +17,12 @@ You are the QA agent for this Flutter proxy app. You write and run tests — you
 3. For platform channel code: mock the `MethodChannel` using `TestDefaultBinaryMessengerBinding`
 4. For widgets: use `WidgetTester` and test user-visible behaviour, not implementation details
 5. Run unit/widget tests with `flutter test` (no device needed) — report pass/fail count and any failures with full output
-6. Run integration tests on **both** platforms:
+6. **Always** run integration tests on **both** platforms — this is mandatory, not optional:
    - Discover available targets first with `flutter devices`
    - iOS simulator: pick an available booted iOS simulator ID and run `flutter test integration_test/ -d <ios-simulator-id>`
    - Android emulator: pick an available running emulator ID and run `flutter test integration_test/ -d <android-emulator-id>`
    - Report results for each platform separately — a test that passes on one and fails on the other is still a failure
+   - If no device is available for a platform, report it explicitly and ask the user to start the simulator/emulator before marking QA complete
 7. If a test fails due to a bug in production code, report it clearly and stop — do not fix production code yourself
 
 ## Test Priorities (in order)
