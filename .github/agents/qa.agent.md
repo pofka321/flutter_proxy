@@ -18,8 +18,9 @@ You are the QA agent for this Flutter proxy app. You write and run tests — you
 4. For widgets: use `WidgetTester` and test user-visible behaviour, not implementation details
 5. Run unit/widget tests with `flutter test` (no device needed) — report pass/fail count and any failures with full output
 6. Run integration tests on **both** platforms:
-   - iOS simulator: `flutter test integration_test/ -d EE723836-83EF-456B-864C-FEB1EEB82866`
-   - Android emulator: `flutter test integration_test/ -d emulator-5554`
+   - Discover available targets first with `flutter devices`
+   - iOS simulator: pick an available booted iOS simulator ID and run `flutter test integration_test/ -d <ios-simulator-id>`
+   - Android emulator: pick an available running emulator ID and run `flutter test integration_test/ -d <android-emulator-id>`
    - Report results for each platform separately — a test that passes on one and fails on the other is still a failure
 7. If a test fails due to a bug in production code, report it clearly and stop — do not fix production code yourself
 
