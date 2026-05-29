@@ -1,3 +1,4 @@
+import CoreLocation
 import Flutter
 import NetworkExtension
 import UIKit
@@ -37,9 +38,54 @@ class SettingsChannel {
           result(nil)
         }
 
+      case "requestWifiSsidPermissions":
+        LocationPermissionRequester.request(flutterResult: result)
+
       default:
         result(FlutterMethodNotImplemented)
       }
     }
+  }
+}
+
+private class LocationPermissionRequester: NSObject, CLLocationManagerDelegate {
+  private static var pendingResults: [FlutterResult] = []
+  private static var locationManager: CLLocationManager?
+  private static var instance: LocationPermissionRequester?
+
+  static func request(flutterResult: @escaping FlutterResult) {
+    DispatchQueue.main.async {
+      let status = CLLocationManager.authorizationStatus()
+      switch status {
+      case .authorizedWhenInUse, .authorizedAlways:
+        flutterResult(true)
+      case .denied, .restricted:
+        flutterResult(false)
+      case .notDetermined:
+        pendingResults.append(flutterResult)
+        if locationManager == nil {
+          let mgr = CLLocationManager()
+          let inst = LocationPermissionRequester()
+          mgr.delegate = inst
+          locationManager = mgr
+          instance = inst
+          mgr.requestWhenInUseAuthorization()
+        }
+      @unknown default:
+        flutterResult(false)
+      }
+    }
+  }
+
+  func locationManager(
+    _ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus
+  ) {
+    guard status != .notDetermined else { return }
+    let granted = status == .authorizedWhenInUse || status == .authorizedAlways
+    let callbacks = LocationPermissionRequester.pendingResults
+    LocationPermissionRequester.pendingResults.removeAll()
+    LocationPermissionRequester.locationManager = nil
+    LocationPermissionRequester.instance = nil
+    callbacks.forEach { $0(granted) }
   }
 }

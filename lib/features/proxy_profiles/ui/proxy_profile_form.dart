@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import '../domain/proxy_profile.dart';
 import '../domain/proxy_type.dart';
@@ -42,13 +43,21 @@ class _ProxyProfileFormState extends State<ProxyProfileForm> {
     );
     _type = widget.initial?.type ?? ProxyType.http;
     if (widget.initial == null) {
-      SettingsChannel.getWifiSsid().then((ssid) {
-        if (mounted) {
-          setState(() {
-            _nameController.text = ssid ?? '';
+      SettingsChannel.requestWifiSsidPermissions()
+          .then((granted) async {
+            if (!granted) return null;
+            return SettingsChannel.getWifiSsid();
+          })
+          .then((ssid) {
+            if (mounted) {
+              setState(() {
+                _nameController.text = ssid ?? '';
+              });
+            }
+          })
+          .catchError((error) {
+            debugPrint('Failed to prefill SSID: $error');
           });
-        }
-      }).catchError((_) {});
     }
   }
 
@@ -63,7 +72,8 @@ class _ProxyProfileFormState extends State<ProxyProfileForm> {
   void _submit() {
     if (!_formKey.currentState!.validate()) return;
     final profile = ProxyProfile(
-      id: widget.initial?.id ??
+      id:
+          widget.initial?.id ??
           DateTime.now().millisecondsSinceEpoch.toString(),
       name: _nameController.text.trim(),
       host: _hostController.text.trim(),
@@ -131,10 +141,7 @@ class _ProxyProfileFormState extends State<ProxyProfileForm> {
               onChanged: (v) => setState(() => _type = v!),
             ),
             const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _submit,
-              child: const Text('Save'),
-            ),
+            ElevatedButton(onPressed: _submit, child: const Text('Save')),
           ],
         ),
       ),
